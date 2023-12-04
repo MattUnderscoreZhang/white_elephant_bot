@@ -20,6 +20,7 @@ def assign_targets(participants: list[str]) -> dict[str, str]:
 if __name__ == '__main__':
     intents = discord.Intents.default()
     intents.messages = True
+    intents.members = True
 
     bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -30,12 +31,11 @@ if __name__ == '__main__':
     @bot.event
     async def on_ready():
         print(f'Logged in as {bot.user}')
-        guild = discord.utils.get(bot.guilds)
-        if guild:
+        if guild := discord.utils.get(bot.guilds):
             for member in guild.members:
                 if member.name in assignments:
                     try:
-                        await member.send(assignments[member.name])
+                        await member.send(f"Your assigned target is: {assignments[member.name]}")
                     except discord.errors.Forbidden:
                         print(f"Couldn't send message to {member.name}")
         await bot.close()
