@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Header
 import os
-from typing import Annotated
 
 
 app = FastAPI()
