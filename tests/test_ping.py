@@ -10,7 +10,7 @@ bot_id=cast(str, os.getenv("BOT_ID"))
 guild_id=cast(str, os.getenv("GUILD_ID"))
 
 
-url = f"https://discord.com/api/v10/applications/{bot_id}/guilds/{guild_id}/commands"
+url = f"https://whiteelephantbot-production.up.railway.app"
 
 
 response = requests.post(
@@ -19,17 +19,7 @@ response = requests.post(
         "Authorization": f"Bot {bot_token}"
     },
     json={
-        "name": "test",
-        "description": "Test slash command",
-        "type": 1,  # slash command
-        "options": [
-            {
-                "name": "message",
-                "description": "Message to echo back",
-                "type": 3,  # string
-                "required": True,
-            },
-        ],
+        "type": 1,
     },
 )
 print(response.json())
