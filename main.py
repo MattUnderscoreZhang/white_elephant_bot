@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import os
 
 
 app = FastAPI()
@@ -6,4 +7,5 @@ app = FastAPI()
 
 @app.get("/test")
 async def _():
-    return {"message": "Hello World"}
+    test_key = os.getenv("TEST_KEY")
+    return {"message": test_key}
