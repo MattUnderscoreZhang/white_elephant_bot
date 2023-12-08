@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 
-@app.get("/test")
+@app.post("/")
 async def _():
     test_key = os.getenv("TEST_KEY")
     return {"message": test_key}
