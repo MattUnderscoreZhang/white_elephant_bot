@@ -162,4 +162,4 @@ cython_debug/
 #.idea/
 
 # my files
-*.txt
+participants.txt
