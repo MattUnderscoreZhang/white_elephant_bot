@@ -32,6 +32,14 @@ async def test_key():
 
 @app.post("/")
 async def _(request: Request, response: Response):
+    print(request)
+    print()
+    print(request.headers)
+    print()
+    print(await request.body())
+    print()
+    print(await request.json())
+    print()
     if not await validate_request(request):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Invalid request signature"
@@ -40,4 +48,3 @@ async def _(request: Request, response: Response):
         return {
             "type": ResponseType.PONG
         }
-    print(request_body)
