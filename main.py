@@ -40,3 +40,4 @@ async def _(request: Request, response: Response):
         return {
             "type": ResponseType.PONG
         }
+    print(request_body)
