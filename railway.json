@@ -3,7 +3,4 @@
   "build": {
     "builder": "NIXPACKS"
   },
-  "deploy": {
-    "startCommand": "source .venv/bin/activate; hypercorn main:app --bind \"[::]:$PORT\""
-  }
 }
