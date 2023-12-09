@@ -8,7 +8,8 @@ def test_ping():
     load_dotenv()
     bot_id=cast(str, os.getenv("BOT_ID"))
 
-    url = f"whiteelephantbot-production.up.railway.app"
+    # url = f"whiteelephantbot-production.up.railway.app"
+    url = "localhost:8000"
 
     response = requests.post(
         url,
