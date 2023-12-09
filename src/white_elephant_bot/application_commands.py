@@ -1,43 +1,32 @@
-import os
-
-from white_elephant_bot.data_types import ResponseType, ApplicationCommandOption
+from white_elephant_bot.data_types import ApplicationCommandOption, ApplicationCommandOption
+from white_elephant_bot.applications import perform_test, summarize
 
 
 async def handle_application_command(
-    command_name: str,
-    command_options: list[ApplicationCommandOption],
+    request_body: dict,
 ):
-    options_dict = _process_command_options(command_options)
+    command_name = request_body["data"]["name"]
+    command_options = _process_command_options(
+        [
+            ApplicationCommandOption(
+                name=option["name"],
+                value=option["value"],
+                option_type=option["type"],
+            )
+            for option in request_body["data"]["options"]
+        ]
+    )
     if command_name == "test":
-        return _handle_test(options_dict["message"])
+        return perform_test.handle(message=command_options["message"])
     elif command_name == "summarize":
-        return _handle_summarize()
+        return summarize.handle(
+            channel_id=request_body["channel_id"],
+            user_name=request_body["member"]["user"]["username"],
+        )
 
 
 def _process_command_options(command_options: list[ApplicationCommandOption]) -> dict:
     return {
         option.name: option.value
         for option in command_options
-    }
-
-
-async def _handle_test(message: str):
-    test_key = os.getenv("TEST_KEY")
-    return {
-        "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        "data": {
-            "content": f"You said {message}.\nSecret key is {test_key}"
-        }
-    }
-
-
-async def _handle_summarize():
-    # You'll need to use Discord API to fetch unread messages in the current channel for the current user
-    # Summarize the unread messages
-    # Return a formatted response
-    return {
-        "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        "data": {
-            "content": "Summary of unread messages: ..."
-        }
     }

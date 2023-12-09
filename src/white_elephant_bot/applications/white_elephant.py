@@ -22,7 +22,7 @@ if __name__ == '__main__':
     intents.messages = True
     intents.members = True
 
-    bot = commands.Bot(command_prefix='!', intents=intents)
+    bot = commands.bot.Bot(command_prefix='!', intents=intents)
 
     with open('participants.txt') as f:
         participants = [line.strip() for line in f]

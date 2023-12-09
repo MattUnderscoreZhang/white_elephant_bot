@@ -5,7 +5,6 @@ from white_elephant_bot.data_types import (
     RequestType,
     ResponseType,
     ApplicationCommandType,
-    ApplicationCommandOption,
 )
 from white_elephant_bot.validation import validate_request
 
@@ -27,18 +26,10 @@ async def _(request: Request, response: Response):
         }
     # handle application command
     elif request_body["type"] == RequestType.APPLICATION_COMMAND:
-        request_body_data = request_body["data"]
-        if request_body_data["type"] == ApplicationCommandType.CHAT_INPUT:
+        request_type = request_body["data"]["type"]
+        if request_type == ApplicationCommandType.CHAT_INPUT:
             return await handle_application_command(
-                request_body_data["name"],
-                [
-                    ApplicationCommandOption(
-                        name=option["name"],
-                        value=option["value"],
-                        option_type=option["type"],
-                    )
-                    for option in request_body_data["options"]
-                ],
+                request_body,
             )
         else:
             return "I currently don't have this functionality."
