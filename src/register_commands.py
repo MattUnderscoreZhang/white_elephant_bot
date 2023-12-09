@@ -5,7 +5,7 @@ from typing import cast
 
 
 load_dotenv()
-bot_token=cast(str, os.getenv("DISCORD_BOT_TOKEN"))
+bot_token=cast(str, os.getenv("BOT_TOKEN"))
 bot_id=cast(str, os.getenv("BOT_ID"))
 guild_id=cast(str, os.getenv("GUILD_ID"))
 

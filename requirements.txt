@@ -3,3 +3,4 @@ slash-discord.py
 python-dotenv
 fastapi
 hypercorn
+pynacl
