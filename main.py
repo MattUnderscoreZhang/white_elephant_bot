@@ -32,7 +32,11 @@ async def _(request: Request, response: Response):
             return await handle_application_command(
                 request_body_data["name"],
                 [
-                    ApplicationCommandOption(**option)
+                    ApplicationCommandOption(
+                        name=option["name"],
+                        value=option["value"],
+                        option_type=option["type"],
+                    )
                     for option in request_body_data["options"]
                 ],
             )

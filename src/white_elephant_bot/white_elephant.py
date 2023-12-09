@@ -41,5 +41,5 @@ if __name__ == '__main__':
         await bot.close()
 
     load_dotenv()
-    bot_token=cast(str, os.getenv("DISCORD_BOT_TOKEN"))
+    bot_token=cast(str, os.getenv("BOT_TOKEN"))
     bot.run(bot_token)
