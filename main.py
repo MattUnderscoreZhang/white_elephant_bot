@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Response, status
 import os
 
-from .src.validation import validate_request
+from white_elephant_bot.validation import validate_request
 
 
 app = FastAPI()

@@ -33,13 +33,3 @@ response = requests.post(
     },
 )
 print(response.json())
-
-
-# command_id = "1182814737927503934"
-# response = requests.delete(
-    # f"applications/{bot_id}/guilds/{guild_id}/commands/{command_id}",
-    # headers={
-        # "Authorization": f"Bot {bot_token}"
-    # },
-# )
-# print(response.json())
