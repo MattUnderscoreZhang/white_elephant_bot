@@ -1,7 +1,12 @@
 from fastapi import FastAPI, Request, Response, status
 
 from white_elephant_bot.application_commands import handle_application_command
-from white_elephant_bot.data_types import RequestType, ResponseType, ApplicationCommandType
+from white_elephant_bot.data_types import (
+    RequestType,
+    ResponseType,
+    ApplicationCommandType,
+    ApplicationCommandOption,
+)
 from white_elephant_bot.validation import validate_request
 
 
@@ -26,7 +31,10 @@ async def _(request: Request, response: Response):
         if request_body_data["type"] == ApplicationCommandType.CHAT_INPUT:
             return await handle_application_command(
                 request_body_data["name"],
-                request_body_data["options"],
+                [
+                    ApplicationCommandOption(**option)
+                    for option in request_body_data["options"]
+                ],
             )
         else:
             return "I currently don't have this functionality."

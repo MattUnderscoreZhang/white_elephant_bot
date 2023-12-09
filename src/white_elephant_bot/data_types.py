@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 class RequestType:
     PING = 1
     APPLICATION_COMMAND = 2
@@ -20,3 +23,10 @@ class ApplicationCommandType:
     CHAT_INPUT = 1
     USER = 2
     MESSAGE = 3
+
+
+@dataclass
+class ApplicationCommandOption:
+    name: str
+    value: str
+    option_type: int
