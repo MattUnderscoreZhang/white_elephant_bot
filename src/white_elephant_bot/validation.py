@@ -14,10 +14,6 @@ async def validate_request(request: Request) -> bool:
         signature = request.headers["X-Signature-Ed25519"];
         timestamp = request.headers["X-Signature-Timestamp"];
         raw_body = await request.body()
-        print("Body:")
-        print(await request.body())
-        print("Json:")
-        print(await request.json())
         verify_key.verify(timestamp.encode() + raw_body, bytes.fromhex(signature))
         return True
     except BadSignatureError:
