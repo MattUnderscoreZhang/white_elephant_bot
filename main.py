@@ -32,19 +32,11 @@ async def test_key():
 
 @app.post("/")
 async def _(request: Request, response: Response):
-    print(request)
-    print()
-    print(request.headers)
-    print()
-    print(await request.body())
-    print()
-    print(await request.json())
-    print()
-    # if not await validate_request(request):
-        # response.status_code = status.HTTP_401_UNAUTHORIZED
-        # return "Invalid request signature"
-    # request_body = await request.json()
-    # if request_body["type"] == RequestType.PING:
-        # return {
-            # "type": ResponseType.PONG
-        # }
+    if not await validate_request(request):
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return "Invalid request signature"
+    request_body = await request.json()
+    if request_body["type"] == RequestType.PING:
+        return {
+            "type": ResponseType.PONG
+        }
