@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Request
 import os
 
 
@@ -6,8 +6,9 @@ app = FastAPI()
 
 
 @app.post("/")
-async def _(request: dict):
-    print(request)
+async def _(request: Request):
+    print(request.json())
+    print(request.headers)
     if request["type"] == 1:
         return {
             "type": 1
