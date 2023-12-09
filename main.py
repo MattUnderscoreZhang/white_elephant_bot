@@ -20,7 +20,7 @@ async def test_key():
 
 @app.post("/")
 async def _(request: Request, response: Response):
-    if not validate_request(request):
+    if not await validate_request(request):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Invalid request signature"
     request_body = await request.json()
