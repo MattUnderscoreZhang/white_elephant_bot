@@ -22,6 +22,8 @@ async def handle_application_command(
         return await summarize.handle(
             guild_id=request_body["guild_id"],
             channel_id=request_body["channel_id"],
+            interaction_id=request_body["id"],
+            token=request_body["token"],
             user_name=request_body["member"]["user"]["username"],
         )
 
