@@ -6,7 +6,6 @@ authors = [
     {name = "Matt Zhang", email = "set.stun@gmail.com"},
 ]
 dependencies = [
-    "slash-discord-py",
     "python-dotenv",
     "fastapi",
     "hypercorn",
