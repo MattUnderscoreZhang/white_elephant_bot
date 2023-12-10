@@ -40,6 +40,7 @@ def _fetch_recent_messages(
             if message['author']['username'] == user_name:
                 return messages
             messages.append(message)
+        last_message_id = messages[-1]['id']
 
 
 def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
@@ -55,7 +56,7 @@ def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
         return {}
     members = response.json()
     return {
-        member['user']['username']: member.get('nick', member['user']['username'])
+        member['user']['id']: member.get('nick', member['user']['username'])
         for member in members
     }
 
@@ -63,7 +64,6 @@ def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
 def _summarize_recent_messages(messages: dict) -> str:
     if len(messages) == 0:
         return "No messages since your last interaction in this channel."
-    load_dotenv()  # load the OpenAI API key from a .env file
     interface = GptInterface(
         openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         model="gpt-3.5-turbo",
@@ -79,7 +79,7 @@ async def _acknowledge_request(interaction_id: int, token: str) -> None:
     requests.post(
         url=f"https://discord.com/api/v9/interactions/{interaction_id}/{token}/callback",
         json={
-            "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            "type": ResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
             "data": {
                 "content": "Processing your request..."
             }
@@ -88,7 +88,6 @@ async def _acknowledge_request(interaction_id: int, token: str) -> None:
 
 
 async def _send_followup_message(token: str, message: str) -> None:
-    load_dotenv()
     requests.post(
         url=f"https://discord.com/api/v9/webhooks/{os.getenv('BOT_ID')}/{token}",
         json={
@@ -105,6 +104,7 @@ async def handle(
     user_name: str,
     max_n_messages: int = 300,
 ):
+    load_dotenv()
     asyncio.create_task(_acknowledge_request(interaction_id, token))
     recent_messages = _fetch_recent_messages(
         channel_id=channel_id,
@@ -113,11 +113,11 @@ async def handle(
     )
     nickname_map = _fetch_guild_nicknames(guild_id)
     message_contents = {
-        nickname_map[message["author"]["username"]]: message["content"]
+        nickname_map[message["author"]["id"]]: message["content"]
         for message in recent_messages[::-1]
     }
     summary = _summarize_recent_messages(message_contents)
     asyncio.create_task(_send_followup_message(token, summary))
     return {
-        "type": ResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
+        "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     }
