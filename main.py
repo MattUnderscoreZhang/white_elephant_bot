@@ -27,6 +27,7 @@ async def _(request: Request, response: Response):
     # handle application command
     elif request_body["type"] == RequestType.APPLICATION_COMMAND:
         request_type = request_body["data"]["type"]
+        print(f"request_type: {request_type}")
         if request_type == ApplicationCommandType.CHAT_INPUT:
             return await handle_application_command(
                 request_body,
