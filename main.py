@@ -19,16 +19,16 @@ async def _(request: Request, response: Response):
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return "Invalid request signature"
     request_body = await request.json()
+    request_type = request_body["type"]
     # respond to ping
-    if request_body["type"] == RequestType.PING:
+    if request_type == RequestType.PING:
         return {
             "type": ResponseType.PONG
         }
     # handle application command
-    elif request_body["type"] == RequestType.APPLICATION_COMMAND:
-        request_type = request_body["data"]["type"]
-        print(f"request_type: {request_type}")
-        if request_type == ApplicationCommandType.CHAT_INPUT:
+    elif request_type == RequestType.APPLICATION_COMMAND:
+        application_command_type = request_body["data"]["type"]
+        if application_command_type == ApplicationCommandType.CHAT_INPUT:
             return await handle_application_command(
                 request_body,
             )
