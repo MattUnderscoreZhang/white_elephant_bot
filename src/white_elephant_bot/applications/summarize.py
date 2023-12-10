@@ -1,4 +1,3 @@
-import asyncio
 from dotenv import load_dotenv
 from gpt_interface import GptInterface
 import os
@@ -105,7 +104,7 @@ async def handle(
     max_n_messages: int = 300,
 ):
     load_dotenv()
-    asyncio.create_task(_acknowledge_request(interaction_id, token))
+    await _acknowledge_request(interaction_id, token)
     recent_messages = _fetch_recent_messages(
         channel_id=channel_id,
         user_name=user_name,
@@ -117,7 +116,7 @@ async def handle(
         for message in recent_messages[::-1]
     }
     summary = _summarize_recent_messages(message_contents)
-    asyncio.create_task(_send_followup_message(token, summary))
+    await _send_followup_message(token, summary)
     return {
         "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     }
