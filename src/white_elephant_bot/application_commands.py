@@ -13,13 +13,14 @@ async def handle_application_command(
                 value=option["value"],
                 option_type=option["type"],
             )
-            for option in request_body["data"]["options"]
+            for option in request_body["data"].get("options", [])
         ],
     )
     if command_name == "test":
         return await perform_test.handle(message=command_options["message"])
     elif command_name == "summarize":
         return await summarize.handle(
+            guild_id=request_body["guild_id"],
             channel_id=request_body["channel_id"],
             user_name=request_body["member"]["user"]["username"],
         )

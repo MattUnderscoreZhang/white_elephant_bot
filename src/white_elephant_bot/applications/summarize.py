@@ -1,8 +1,7 @@
-import discord
-from discord.ext import commands
 from dotenv import load_dotenv
 from gpt_interface import GptInterface
 import os
+import requests
 from typing import cast
 
 from white_elephant_bot.data_types import ResponseType
@@ -11,32 +10,53 @@ from white_elephant_bot.data_types import ResponseType
 def _fetch_recent_messages(
     channel_id: int,
     user_name: str,
-    max_n_messages: int | None = 300,
-) -> list[discord.Message]:
-    intents = discord.Intents.default()
-    intents.messages = True
-    intents.members = True
-
-    bot = commands.bot.Bot(command_prefix='!', intents=intents)
+    max_n_messages: int = 300,
+) -> list[dict]:
     messages = []
+    last_message_id = None
+    while True:
+        n_messages_to_fetch = min(100, max_n_messages - len(messages))
+        if n_messages_to_fetch <= 0:
+            return messages
+        response = requests.get(
+            url=(
+                f"https://discord.com/api/v9/channels/{channel_id}/messages" +
+                (
+                    f"?before={last_message_id}&limit={n_messages_to_fetch}"
+                    if last_message_id
+                    else f"?limit={n_messages_to_fetch}"
+                )
+            ),
+            headers={
+                "Authorization": f"Bot {os.getenv('BOT_TOKEN')}",
+                "User-Agent": "WhiteElephantBot",
+            },
+        )
+        if response.status_code != 200:
+            print(f"Error fetching messages: {response.status_code} - {response.json()}")
+            return messages
+        for message in response.json():
+            if message['author']['username'] == user_name:
+                return messages
+            messages.append(message)
 
-    @bot.event
-    async def on_ready():
-        print(f'Logged in as {bot.user}')
-        channel = bot.get_channel(channel_id)
-        if isinstance(channel, discord.TextChannel):
-            nonlocal messages
-            async for message in channel.history(limit=cast(int, max_n_messages)):
-                if message.author.name == user_name:
-                    break
-                messages.append(message)
-            await bot.close()
-        await bot.close()
 
-    load_dotenv()
-    bot_token=cast(str, os.getenv("BOT_TOKEN"))
-    bot.run(bot_token)
-    return messages
+def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
+    response = requests.get(
+        url=f"https://discord.com/api/v9/guilds/{guild_id}/members?limit=1000",
+        headers={
+            "Authorization": f"Bot {os.getenv('BOT_TOKEN')}",
+            "User-Agent": "WhiteElephantBot",
+        },
+    )
+    if response.status_code != 200:
+        print(f"Error fetching member data: {response.status_code} - {response.json()}")
+        return {}
+    members = response.json()
+    return {
+        member['user']['username']: member.get('nick', member['user']['username'])
+        for member in members
+    }
 
 
 def _summarize_recent_messages(messages: dict) -> str:
@@ -53,22 +73,22 @@ def _summarize_recent_messages(messages: dict) -> str:
 
 
 async def handle(
+    guild_id: int,
     channel_id: int,
     user_name: str,
-    max_n_messages: int | None = 300,
+    max_n_messages: int = 300,
 ):
     recent_messages = _fetch_recent_messages(
         channel_id=channel_id,
         user_name=user_name,
         max_n_messages=max_n_messages,
     )
+    nickname_map = _fetch_guild_nicknames(guild_id)
     message_contents = {
-        message.author.nick: message.content
+        nickname_map[message["author"]["username"]]: message["content"]
         for message in recent_messages[::-1]
     }
-    print(message_contents)
     summary = _summarize_recent_messages(message_contents)
-    print(summary)
     return {
         "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         "data": {
