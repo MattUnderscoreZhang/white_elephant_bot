@@ -64,7 +64,7 @@ def _summarize_recent_messages(messages: dict) -> str:
         return "No messages since your last interaction in this channel."
     interface = GptInterface(
         openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
-        model="gpt-3.5-turbo",
+        model="gpt-4-turbo",
     )
     interface.set_system_message(
         "You get passed a log of Discord messages. Summarize what was said, without additional commentary.",
@@ -112,6 +112,7 @@ async def handle(
         nickname_map[message["author"]["id"]]: message["content"]
         for message in recent_messages[::-1]
     }
+    print(message_contents)  # debugging
     summary = _summarize_recent_messages(message_contents)
     await _send_followup_message(token, summary)
     return {
