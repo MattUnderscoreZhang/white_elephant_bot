@@ -64,7 +64,7 @@ def _summarize_recent_messages(messages: dict) -> str:
         return "No messages since your last interaction in this channel."
     interface = GptInterface(
         openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
-        model="gpt-4-turbo",
+        model="gpt-4",
     )
     interface.set_system_message(
         "You get passed a log of Discord messages. Summarize what was said, without additional commentary.",
