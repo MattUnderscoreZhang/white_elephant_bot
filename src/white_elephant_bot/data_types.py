@@ -37,10 +37,3 @@ class ApplicationCommandOptionType:
     MENTIONABLE = 9  # includes users and roles
     NUMBER = 10
     ATTACHMENT = 11
-
-
-@dataclass
-class ApplicationCommandOption:
-    name: str
-    value: str
-    option_type: ApplicationCommandOptionType

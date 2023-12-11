@@ -116,10 +116,6 @@ async def handle(
         f'{nickname_map[message["author"]["id"]]}: {message["content"]}'
         for message in recent_messages[::-1]
     ]
-    requests.post(  # debugging
-        url=f"https://discord.com/api/v9/webhooks/{os.getenv('BOT_ID')}/{token}",
-        json=message_contents,
-    )
     summary = _summarize_recent_messages(message_contents)
     await _send_followup_message(token, summary)
     return {
