@@ -3,6 +3,8 @@ import os
 import requests
 from typing import cast
 
+from white_elephant_bot.data_types import ApplicationCommandOptionType
+
 
 load_dotenv()
 bot_token=cast(str, os.getenv("BOT_TOKEN"))
@@ -26,7 +28,7 @@ response = requests.post(
             {
                 "name": "message",
                 "description": "Message to echo back",
-                "type": 3,  # string
+                "type": ApplicationCommandOptionType.STRING,
                 "required": True,
             },
         ],
