@@ -10,6 +10,7 @@ dependencies = [
     "fastapi",
     "hypercorn",
     "py-gpt-interface>=0.6.0",
+    "pynacl>=1.5.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
