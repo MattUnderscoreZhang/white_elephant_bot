@@ -67,7 +67,7 @@ def _summarize_recent_messages(messages: dict) -> str:
         model="gpt-4",
     )
     interface.set_system_message(
-        "You get passed a log of Discord messages. Summarize what was said, without additional commentary.",
+        "The user will pass you their missed Discord messages. Summarize the content of the logs, without additional commentary.",
     )
     summary = interface.say(str(messages))
     return summary
@@ -112,7 +112,10 @@ async def handle(
         nickname_map[message["author"]["id"]]: message["content"]
         for message in recent_messages[::-1]
     }
-    print(message_contents)  # debugging
+    requests.post(  # debugging
+        url=f"https://discord.com/api/v9/webhooks/{os.getenv('BOT_ID')}/{token}",
+        json=message_contents,
+    )
     summary = _summarize_recent_messages(message_contents)
     await _send_followup_message(token, summary)
     return {
