@@ -1,3 +1,7 @@
+# need to be rewritten with API calls
+
+
+"""
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -43,3 +47,4 @@ if __name__ == '__main__':
     load_dotenv()
     bot_token=cast(str, os.getenv("BOT_TOKEN"))
     bot.run(bot_token)
+"""

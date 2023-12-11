@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-
-
 class RequestType:
     PING = 1
     APPLICATION_COMMAND = 2
