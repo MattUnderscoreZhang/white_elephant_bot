@@ -9,7 +9,7 @@ from white_elephant_bot.data_types import ResponseType
 
 def _fetch_recent_messages(
     channel_id: int,
-    n_messages: int = 300,
+    n_messages: int,
 ) -> list[dict]:
     messages = []
     last_message_id = None
@@ -54,12 +54,16 @@ def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
         return {}
     members = response.json()
     return {
-        member['user']['id']: member.get('nick', member['user']['username'])
+        member['user']['id']: (
+            member['nick']
+            if member['nick']
+            else member['user']['global_name']
+        )
         for member in members
     }
 
 
-def _summarize_recent_messages(messages: dict) -> str:
+def _summarize_recent_messages(messages: list[str]) -> str:
     if len(messages) == 0:
         return "No messages since your last interaction in this channel."
     interface = GptInterface(
@@ -67,9 +71,9 @@ def _summarize_recent_messages(messages: dict) -> str:
         model="gpt-4",
     )
     interface.set_system_message(
-        "The user will pass you their missed Discord messages. Summarize the content of the logs, without additional commentary.",
+        "These are my missed Discord messages. Summarize the content of the logs in a paragraph, without additional commentary. Assume users labelled 'None' are bots, and ignore what they say unless human users comment on it.",
     )
-    summary = interface.say(str(messages))
+    summary = interface.say(("\n").join(messages))
     return summary
 
 
@@ -108,10 +112,10 @@ async def handle(
         n_messages=n_messages,
     )
     nickname_map = _fetch_guild_nicknames(guild_id)
-    message_contents = {
-        nickname_map[message["author"]["id"]]: message["content"]
+    message_contents = [
+        f'{nickname_map[message["author"]["id"]]}: {message["content"]}'
         for message in recent_messages[::-1]
-    }
+    ]
     requests.post(  # debugging
         url=f"https://discord.com/api/v9/webhooks/{os.getenv('BOT_ID')}/{token}",
         json=message_contents,
