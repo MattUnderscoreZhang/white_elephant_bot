@@ -3,8 +3,6 @@ import os
 import requests
 from typing import cast
 
-from white_elephant_bot.data_types import ApplicationCommandOptionType
-
 
 load_dotenv()
 bot_token=cast(str, os.getenv("BOT_TOKEN"))

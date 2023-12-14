@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from gpt_interface import GptInterface
 import os
 import requests
+from time import sleep
 from typing import cast
 
 from white_elephant_bot.data_types import ResponseType
@@ -44,11 +45,15 @@ def _fetch_recent_messages(
 def _fetch_messages_since_last_user_message(
     channel_id: int,
     user_id: int,
+    max_messages: int = 1000,
 ) -> list[dict]:
     messages = []
     last_message_id = None
     while True:
+        if len(messages) >= max_messages:
+            return messages
         n_messages_in_current_batch = 100
+        sleep(1)  # rate limit
         response = requests.get(
             url=(
                 f"https://discord.com/api/v9/channels/{channel_id}/messages" +
@@ -67,7 +72,7 @@ def _fetch_messages_since_last_user_message(
             print(f"Error fetching messages: {response.status_code} - {response.json()}")
             return messages
         for message in response.json():
-            if message['author']['id'] == user_id:
+            if int(message['author']['id']) == user_id:
                 return messages
             messages.append(message)
         last_message_id = messages[-1]['id']
