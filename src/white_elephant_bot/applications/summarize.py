@@ -9,7 +9,7 @@ from white_elephant_bot.data_types import ResponseType
 
 
 def _fetch_recent_messages(
-    channel_id: int,
+    channel_id: str,
     n_messages: int,
     max_messages: int = 400,
 ) -> list[dict]:
@@ -47,8 +47,8 @@ def _fetch_recent_messages(
 
 
 def _fetch_messages_since_last_user_message(
-    channel_id: int,
-    user_id: int,
+    channel_id: str,
+    user_id: str,
     max_messages: int = 400,
 ) -> list[dict]:
     messages = []
@@ -82,7 +82,7 @@ def _fetch_messages_since_last_user_message(
         last_message_id = messages[-1]['id']
 
 
-def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
+def _fetch_guild_nicknames(guild_id: str) -> dict[str, str]:
     response = requests.get(
         url=f"https://discord.com/api/v9/guilds/{guild_id}/members?limit=1000",
         headers={
@@ -121,7 +121,7 @@ def _summarize_recent_messages(messages: list[str]) -> str:
     return summary
 
 
-async def _acknowledge_request(interaction_id: int, token: str) -> None:
+async def _acknowledge_request(interaction_id: str, token: str) -> None:
     requests.post(
         url=f"https://discord.com/api/v9/interactions/{interaction_id}/{token}/callback",
         json={
@@ -143,10 +143,10 @@ async def _send_followup_message(token: str, message: str) -> None:
 
 
 async def summarize(
-    guild_id: int,
-    channel_id: int,
+    guild_id: str,
+    channel_id: str,
     n_messages: int,
-    interaction_id: int,
+    interaction_id: str,
     token: str,
 ):
     load_dotenv()
@@ -168,10 +168,10 @@ async def summarize(
 
 
 async def summarize_since_last_message(
-    guild_id: int,
-    channel_id: int,
-    user_id: int,
-    interaction_id: int,
+    guild_id: str,
+    channel_id: str,
+    user_id: str,
+    interaction_id: str,
     token: str,
 ):
     load_dotenv()
