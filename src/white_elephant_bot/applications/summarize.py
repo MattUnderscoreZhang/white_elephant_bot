@@ -41,6 +41,38 @@ def _fetch_recent_messages(
         last_message_id = messages[-1]['id']
 
 
+def _fetch_messages_since_last_user_message(
+    channel_id: int,
+    user_id: int,
+) -> list[dict]:
+    messages = []
+    last_message_id = None
+    while True:
+        n_messages_in_current_batch = 100
+        response = requests.get(
+            url=(
+                f"https://discord.com/api/v9/channels/{channel_id}/messages" +
+                (
+                    f"?before={last_message_id}&limit={n_messages_in_current_batch}"
+                    if last_message_id
+                    else f"?limit={n_messages_in_current_batch}"
+                )
+            ),
+            headers={
+                "Authorization": f"Bot {os.getenv('BOT_TOKEN')}",
+                "User-Agent": "WhiteElephantBot",
+            },
+        )
+        if response.status_code != 200:
+            print(f"Error fetching messages: {response.status_code} - {response.json()}")
+            return messages
+        for message in response.json():
+            if message['author']['id'] == user_id:
+                return messages
+            messages.append(message)
+        last_message_id = messages[-1]['id']
+
+
 def _fetch_guild_nicknames(guild_id: int) -> dict[str, str]:
     response = requests.get(
         url=f"https://discord.com/api/v9/guilds/{guild_id}/members?limit=1000",
@@ -98,7 +130,7 @@ async def _send_followup_message(token: str, message: str) -> None:
     )
 
 
-async def handle(
+async def summarize(
     guild_id: int,
     channel_id: int,
     n_messages: int,
@@ -110,6 +142,31 @@ async def handle(
     recent_messages = _fetch_recent_messages(
         channel_id=channel_id,
         n_messages=n_messages,
+    )
+    nickname_map = _fetch_guild_nicknames(guild_id)
+    message_contents = [
+        f'{nickname_map[message["author"]["id"]]}: {message["content"]}'
+        for message in recent_messages[::-1]
+    ]
+    summary = _summarize_recent_messages(message_contents)
+    await _send_followup_message(token, summary)
+    return {
+        "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    }
+
+
+async def summarize_since_last_message(
+    guild_id: int,
+    channel_id: int,
+    user_id: int,
+    interaction_id: int,
+    token: str,
+):
+    load_dotenv()
+    await _acknowledge_request(interaction_id, token)
+    recent_messages = _fetch_messages_since_last_user_message(
+        channel_id=channel_id,
+        user_id=user_id,
     )
     nickname_map = _fetch_guild_nicknames(guild_id)
     message_contents = [
