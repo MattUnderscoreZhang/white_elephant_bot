@@ -76,8 +76,7 @@ def _fetch_messages_since_last_user_message(
             print(f"Error fetching messages: {response.status_code} - {response.json()}")
             return messages
         for message in response.json():
-            print(message['author']['id'], user_id, int(message['author']['id']) == user_id)
-            if int(message['author']['id']) == user_id:
+            if message['author']['id'] == str(user_id):
                 return messages
             messages.append(message)
         last_message_id = messages[-1]['id']
