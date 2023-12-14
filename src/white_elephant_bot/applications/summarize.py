@@ -106,8 +106,8 @@ def _fetch_guild_nicknames(guild_id: str) -> dict[str, str]:
 
 def _summarize_recent_messages(messages: list[str]) -> str:
     print(f"Summarizing {messages}")
-    if len(messages) == 0:
-        return "There is no new activity on this channel since your last message."
+    if ("\n").join(messages).strip() == "":
+        return "There is no new non-bot activity on this channel since your last message."
     interface = GptInterface(
         openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         model="gpt-4",
