@@ -105,8 +105,9 @@ def _fetch_guild_nicknames(guild_id: str) -> dict[str, str]:
 
 
 def _summarize_recent_messages(messages: list[str]) -> str:
+    print(f"Summarizing {messages}")
     if len(messages) == 0:
-        return "No messages since your last interaction in this channel."
+        return "There is no new activity on this channel since your last message."
     interface = GptInterface(
         openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         model="gpt-4",
@@ -187,13 +188,6 @@ async def summarize_since_my_last_message(
         channel_id=channel_id,
         user_id=user_id,
     )
-    if len(recent_messages) == 0:
-        return {
-            "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {
-                "content": "There is no new activity on this channel since your last message."
-            }
-        }
     nickname_map = _fetch_guild_nicknames(guild_id)
     message_contents = [
         f'{nickname_map[message["author"]["id"]]}: {message["content"]}'
