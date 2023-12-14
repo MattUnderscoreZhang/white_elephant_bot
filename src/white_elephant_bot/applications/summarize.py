@@ -21,7 +21,7 @@ def _fetch_recent_messages(
         n_messages_in_current_batch = min(100, n_messages - len(messages))
         if n_messages_in_current_batch <= 0:
             return messages
-        sleep(1)  # rate limit
+        sleep(0.1)  # rate limit
         response = requests.get(
             url=(
                 f"https://discord.com/api/v9/channels/{channel_id}/messages" +
@@ -57,7 +57,7 @@ def _fetch_messages_since_last_user_message(
         if len(messages) >= max_messages:
             return messages
         n_messages_in_current_batch = 100
-        sleep(1)  # rate limit
+        sleep(0.1)  # rate limit
         response = requests.get(
             url=(
                 f"https://discord.com/api/v9/channels/{channel_id}/messages" +
