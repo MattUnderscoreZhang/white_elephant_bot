@@ -11,7 +11,7 @@ from white_elephant_bot.data_types import ResponseType
 def _fetch_recent_messages(
     channel_id: int,
     n_messages: int,
-    max_messages: int = 1000,
+    max_messages: int = 400,
 ) -> list[dict]:
     messages = []
     last_message_id = None
@@ -49,7 +49,7 @@ def _fetch_recent_messages(
 def _fetch_messages_since_last_user_message(
     channel_id: int,
     user_id: int,
-    max_messages: int = 1000,
+    max_messages: int = 400,
 ) -> list[dict]:
     messages = []
     last_message_id = None
@@ -114,7 +114,10 @@ def _summarize_recent_messages(messages: list[str]) -> str:
     interface.set_system_message(
         "These are my missed Discord messages. Summarize the content of the logs in a paragraph, without additional commentary. Assume users labelled 'None' are bots, and ignore what they say unless human users comment on it.",
     )
-    summary = interface.say(("\n").join(messages))
+    try:
+        summary = interface.say(("\n").join(messages))
+    except Exception as e:
+        return f"Error: {e}"
     return summary
 
 
