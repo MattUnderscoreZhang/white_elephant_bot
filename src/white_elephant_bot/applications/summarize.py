@@ -149,6 +149,13 @@ async def summarize(
     interaction_id: str,
     token: str,
 ):
+    if type(n_messages) is not int or n_messages <= 0:
+        return {
+            "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            "data": {
+                "content": "n_messages parameter must be an integer greater than 0."
+            }
+        }
     load_dotenv()
     await _acknowledge_request(interaction_id, token)
     recent_messages = _fetch_recent_messages(
@@ -167,7 +174,7 @@ async def summarize(
     }
 
 
-async def summarize_since_last_message(
+async def summarize_since_my_last_message(
     guild_id: str,
     channel_id: str,
     user_id: str,
@@ -180,6 +187,13 @@ async def summarize_since_last_message(
         channel_id=channel_id,
         user_id=user_id,
     )
+    if len(recent_messages) == 0:
+        return {
+            "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            "data": {
+                "content": "There is no new activity on this channel since your last message."
+            }
+        }
     nickname_map = _fetch_guild_nicknames(guild_id)
     message_contents = [
         f'{nickname_map[message["author"]["id"]]}: {message["content"]}'

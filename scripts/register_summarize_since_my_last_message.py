@@ -19,7 +19,7 @@ response = requests.post(
         "Authorization": f"Bot {bot_token}"
     },
     json={
-        "name": "summarize_since_last_message",
+        "name": "summarize_since_my_last_message",
         "description": "Summarize messages on channel since last user message",
         "type": 1,  # slash command
         "options": [],

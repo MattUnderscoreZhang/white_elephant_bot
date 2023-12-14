@@ -19,8 +19,8 @@ async def handle_application_command(
             interaction_id=request_body["id"],
             token=request_body["token"],
         )
-    elif command_name == "summarize_since_last_message":
-        return await summarize.summarize_since_last_message(
+    elif command_name == "summarize_since_my_last_message":
+        return await summarize.summarize_since_my_last_message(
             guild_id=request_body["guild_id"],
             channel_id=request_body["channel_id"],
             user_id=request_body["member"]["user"]["id"],
