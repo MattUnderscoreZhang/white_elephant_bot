@@ -11,13 +11,17 @@ from white_elephant_bot.data_types import ResponseType
 def _fetch_recent_messages(
     channel_id: int,
     n_messages: int,
+    max_messages: int = 1000,
 ) -> list[dict]:
     messages = []
     last_message_id = None
     while True:
+        if len(messages) >= max_messages:
+            return messages
         n_messages_in_current_batch = min(100, n_messages - len(messages))
         if n_messages_in_current_batch <= 0:
             return messages
+        sleep(1)  # rate limit
         response = requests.get(
             url=(
                 f"https://discord.com/api/v9/channels/{channel_id}/messages" +
