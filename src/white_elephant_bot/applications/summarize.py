@@ -18,7 +18,7 @@ def _fetch_recent_messages(
     while True:
         if len(messages) >= max_messages:
             return messages
-        n_messages_in_current_batch = min(100, n_messages - len(messages))
+        n_messages_in_current_batch = min(100, n_messages + 1 - len(messages))  # add one to account for the bot's own message
         if n_messages_in_current_batch <= 0:
             return messages
         sleep(0.1)  # rate limit
