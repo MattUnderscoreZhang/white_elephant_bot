@@ -2,84 +2,10 @@ from dotenv import load_dotenv
 from gpt_interface import GptInterface
 import os
 import requests
-from time import sleep
 from typing import cast
 
-from white_elephant_bot.data_types import ResponseType
-
-
-def _fetch_recent_messages(
-    channel_id: str,
-    n_messages: int,
-    max_messages: int = 400,
-) -> list[dict]:
-    messages = []
-    last_message_id = None
-    while True:
-        if len(messages) >= max_messages:
-            return messages
-        n_messages_in_current_batch = min(100, n_messages + 1 - len(messages))  # add one to account for the bot's own message
-        if n_messages_in_current_batch <= 0:
-            return messages
-        sleep(0.1)  # rate limit
-        response = requests.get(
-            url=(
-                f"https://discord.com/api/v9/channels/{channel_id}/messages" +
-                (
-                    f"?before={last_message_id}&limit={n_messages_in_current_batch}"
-                    if last_message_id
-                    else f"?limit={n_messages_in_current_batch}"
-                )
-            ),
-            headers={
-                "Authorization": f"Bot {os.getenv('BOT_TOKEN')}",
-                "User-Agent": "WhiteElephantBot",
-            },
-        )
-        if response.status_code != 200:
-            print(f"Error fetching messages: {response.status_code} - {response.json()}")
-            return messages
-        messages += [
-            message
-            for message in response.json()
-        ]
-        last_message_id = messages[-1]['id']
-
-
-def _fetch_messages_since_last_user_message(
-    channel_id: str,
-    user_id: str,
-    max_messages: int = 400,
-) -> list[dict]:
-    messages = []
-    last_message_id = None
-    while True:
-        if len(messages) >= max_messages:
-            return messages
-        n_messages_in_current_batch = 100
-        sleep(0.1)  # rate limit
-        response = requests.get(
-            url=(
-                f"https://discord.com/api/v9/channels/{channel_id}/messages" +
-                (
-                    f"?before={last_message_id}&limit={n_messages_in_current_batch}"
-                    if last_message_id
-                    else f"?limit={n_messages_in_current_batch}"
-                )
-            ),
-            headers={
-                "Authorization": f"Bot {os.getenv('BOT_TOKEN')}",
-                "User-Agent": "WhiteElephantBot",
-            },
-        )
-        if response.status_code != 200:
-            print(f"Error fetching messages: {response.status_code} - {response.json()}")
-            return messages
-        for message in response.json():
-            if message['author']['id'] == user_id:
-                return messages
-            messages.append(message)
-        last_message_id = messages[-1]['id']
+from white_elephant_bot.utils.async_function import acknowledge_request, send_followup_message
+from white_elephant_bot.utils.fetch_messages import fetch_recent_messages, fetch_messages_since_last_user_message
 
 
 def _fetch_guild_nicknames(guild_id: str) -> dict[str, str]:
@@ -122,27 +48,6 @@ def _summarize_recent_messages(messages: list[str]) -> str:
     return summary
 
 
-async def _acknowledge_request(interaction_id: str, token: str) -> None:
-    requests.post(
-        url=f"https://discord.com/api/v9/interactions/{interaction_id}/{token}/callback",
-        json={
-            "type": ResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {
-                "content": "Processing your request..."
-            }
-        },
-    )
-
-
-async def _send_followup_message(token: str, message: str) -> None:
-    requests.post(
-        url=f"https://discord.com/api/v9/webhooks/{os.getenv('BOT_ID')}/{token}",
-        json={
-            "content": message
-        }
-    )
-
-
 async def summarize(
     guild_id: str,
     channel_id: str,
@@ -158,8 +63,8 @@ async def summarize(
             }
         }
     load_dotenv()
-    await _acknowledge_request(interaction_id, token)
-    recent_messages = _fetch_recent_messages(
+    await acknowledge_request(interaction_id, token)
+    recent_messages = fetch_recent_messages(
         channel_id=channel_id,
         n_messages=n_messages,
     )
@@ -169,7 +74,7 @@ async def summarize(
         for message in recent_messages[::-1]
     ]
     summary = _summarize_recent_messages(message_contents)
-    await _send_followup_message(token, summary)
+    await send_followup_message(token, summary)
     return {
         "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     }
@@ -183,8 +88,8 @@ async def summarize_since_my_last_message(
     token: str,
 ):
     load_dotenv()
-    await _acknowledge_request(interaction_id, token)
-    recent_messages = _fetch_messages_since_last_user_message(
+    await acknowledge_request(interaction_id, token)
+    recent_messages = fetch_messages_since_last_user_message(
         channel_id=channel_id,
         user_id=user_id,
     )
@@ -194,7 +99,7 @@ async def summarize_since_my_last_message(
         for message in recent_messages[::-1]
     ]
     summary = _summarize_recent_messages(message_contents)
-    await _send_followup_message(token, summary)
+    await send_followup_message(token, summary)
     return {
         "type": ResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     }

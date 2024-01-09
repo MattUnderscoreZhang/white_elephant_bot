@@ -1,4 +1,4 @@
-from white_elephant_bot.applications import perform_test, summarize
+from white_elephant_bot.applications import perform_test, summarize, emojify
 
 
 async def handle_application_command(
@@ -27,3 +27,22 @@ async def handle_application_command(
             interaction_id=request_body["id"],
             token=request_body["token"],
         )
+    elif command_name == "emojify_last_message":
+        return await emojify.emojify_last_message(
+            channel_id=request_body["channel_id"],
+            interaction_id=request_body["id"],
+            token=request_body["token"],
+        )
+
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    from asyncio import run
+    from typing import cast
+    import os
+    load_dotenv()
+    channel_id = cast(str, os.getenv("TEST_CHANNEL_ID"))
+    interaction_id = cast(str, os.getenv("TEST_INTERACTION_ID"))
+    token = cast(str, os.getenv("BOT_TOKEN"))
+    message = run(handle_application_command({"data": {"name": "emojify_last_message"}, "channel_id": channel_id, "id": interaction_id, "token": token, "guild_id": ""}))
+    print(message)
