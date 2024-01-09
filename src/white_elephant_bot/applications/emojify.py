@@ -24,8 +24,8 @@ async def emojify_last_message(
     )
     last_message = fetch_recent_messages(
         channel_id=channel_id,
-        n_messages=1,
-    )[0]["content"]
+        n_messages=2,
+    )[1]["content"]  # skip over the bot's own message
     emojified_message = interface.say(
         "Repeat this message back to me using only emojis. Translate the meaning rather than the literal words. The message: "
         + last_message
