@@ -31,6 +31,7 @@ def fetch_recent_messages(
                 "User-Agent": "WhiteElephantBot",
             },
         )
+        raise Exception(f"BLAH: {response.status_code} - {response.json()}")
         if response.status_code != 200:
             print(f"Error fetching messages: {response.status_code} - {response.json()}")
             return messages

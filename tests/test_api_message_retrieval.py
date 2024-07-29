@@ -60,7 +60,7 @@ def _fetch_guild_nicknames(guild_id: str) -> dict[str, str]:
 
 def _summarize_recent_messages(messages: dict) -> str:
     interface = GptInterface(
-        openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
+        api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         model="gpt-3.5-turbo",
     )
     interface.set_system_message(

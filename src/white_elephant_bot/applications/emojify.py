@@ -19,7 +19,7 @@ async def emojify_last_message(
     load_dotenv()
     await acknowledge_request(interaction_id, token)
     interface = GptInterface(
-        openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
+        api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         model="gpt-4",
     )
     last_message = fetch_recent_messages(

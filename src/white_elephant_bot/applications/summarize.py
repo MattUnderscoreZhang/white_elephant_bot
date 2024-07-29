@@ -4,6 +4,7 @@ import os
 import requests
 from typing import cast
 
+from white_elephant_bot.data_types import ResponseType
 from white_elephant_bot.utils.async_function import acknowledge_request, send_followup_message
 from white_elephant_bot.utils.fetch_messages import fetch_recent_messages, fetch_messages_since_last_user_message
 
@@ -35,7 +36,7 @@ def _summarize_recent_messages(messages: list[str]) -> str:
     if len([m for m in messages if not m.startswith("None:")]) == 0:
         return "There is no new non-bot activity on this channel since your last message."
     interface = GptInterface(
-        openai_api_key=cast(str, os.getenv("OPENAI_API_KEY")),
+        api_key=cast(str, os.getenv("OPENAI_API_KEY")),
         model="gpt-4",
     )
     interface.set_system_message(
